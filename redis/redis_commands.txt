@@ -1,0 +1,43 @@
+# Redis: команди з розділу 6.4 звіту
+
+# 6.4.1 Рядки: сесія та лічильник переглядів
+SET session:u1001 "Daryna" EX 1800
+GET session:u1001
+TTL session:u1001
+INCR views:SMA-000123
+INCR views:SMA-000123
+GET views:SMA-000123
+
+# 6.4.2 Хеш: кошик покупця
+HSET cart:u1001 SMA-000123 2 BOO-000007 1
+HGETALL cart:u1001
+HINCRBY cart:u1001 SMA-000123 1
+HDEL cart:u1001 BOO-000007
+HLEN cart:u1001
+EXPIRE cart:u1001 86400
+
+# 6.4.3 Список: нещодавно переглянуті товари
+LPUSH recent:u1001 SMA-000123 LAP-000045 SHO-000310
+LRANGE recent:u1001 0 -1
+LTRIM recent:u1001 0 4
+LLEN recent:u1001
+
+# 6.4.4 Множина: теги товарів
+SADD tag:new SMA-000123 LAP-000045 BOO-000007
+SADD tag:sale SMA-000123 SHO-000310
+SMEMBERS tag:new
+SINTER tag:new tag:sale
+SISMEMBER tag:sale BOO-000007
+
+# 6.4.5 Впорядкована множина: топ продажів
+ZADD top:sales 120 SMA-000123 85 LAP-000045 300 BOO-000007 40 SHO-000310
+ZINCRBY top:sales 5 SMA-000123
+ZRANGE top:sales 0 2 REV WITHSCORES
+ZSCORE top:sales LAP-000045
+
+# 6.4.6 Службові команди
+TYPE cart:u1001
+EXISTS cart:u1001
+SCAN 0 MATCH cart:*
+DEL views:SMA-000123
+EXISTS views:SMA-000123
